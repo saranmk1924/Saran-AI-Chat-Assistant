@@ -1,3 +1,4 @@
+import 'package:ai_chat_assistant/core/utils/typewriter.dart';
 import 'package:ai_chat_assistant/feature/chat/domain/entity/message_entity.dart';
 import 'package:ai_chat_assistant/feature/chat/domain/usecase/send_message_usecase.dart';
 import 'package:ai_chat_assistant/feature/chat/presentation/bloc/chat_event.dart';
@@ -42,7 +43,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     final buffer = StringBuffer();
     try {
-      await for (final piece in sendMessageUsecase(history)) {
+      await for (final piece in typewriter(sendMessageUsecase(history))) {
         buffer.write(piece);
         emit(
           state.copyWith(

@@ -11,5 +11,8 @@ class AppConfig {
   static bool get hasApiKey => geminiApiKey.isNotEmpty;
 
   static const String chatSystemPrompt =
-    'You are a helpful, concise assistant. Answer clearly in simple language.';
+      'You are a helpful, concise assistant. Answer clearly in simple language. '
+      'You do not have access to the internet or live data. If a question needs '
+      'current news, prices or recent events, say that your information may be '
+      'outdated.';
 }

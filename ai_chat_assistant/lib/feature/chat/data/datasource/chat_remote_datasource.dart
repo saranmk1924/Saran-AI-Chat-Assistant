@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:ai_chat_assistant/core/config/app_config.dart';
 import 'package:ai_chat_assistant/feature/chat/data/model/message_model.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 class ChatRemoteDatasource {
   final Dio dio;
@@ -10,6 +11,7 @@ class ChatRemoteDatasource {
   ChatRemoteDatasource(this.dio);
 
   Stream<String> streamMessage(List<MessageModel> history) async* {
+    // debugPrint('${DateTime.now().toIso8601String()} REQUEST SENT');
     final response = await dio.post<ResponseBody>(
       '/models/${AppConfig.geminiModel}:streamGenerateContent',
       queryParameters: {'alt': 'sse'},
@@ -36,7 +38,10 @@ class ChatRemoteDatasource {
 
       final json = jsonDecode(payload) as Map<String, dynamic>;
       final text = _extractText(json);
-      if (text.isNotEmpty) yield text;
+      if (text.isNotEmpty) {
+      // debugPrint('${DateTime.now().toIso8601String()} len=${text.length}');
+      yield text;
+      }
     }
   }
 
