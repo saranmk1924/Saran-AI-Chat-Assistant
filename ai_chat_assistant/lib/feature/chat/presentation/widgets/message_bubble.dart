@@ -31,10 +31,15 @@ class MessageBubble extends StatelessWidget {
         ),
         child: isWaiting
             ? TypingIndicator(color: scheme.onSurfaceVariant)
-            : SelectableText(
-                message.text,
-                style: TextStyle(
-                  color: isUser ? scheme.onPrimary : scheme.onSurface,
+            : DefaultSelectionStyle(
+                cursorColor: isUser ? scheme.onPrimary : scheme.primary,
+                selectionColor: (isUser ? scheme.onPrimary : scheme.primary)
+                    .withValues(alpha: 0.3),
+                child: SelectableText(
+                  message.text,
+                  style: TextStyle(
+                    color: isUser ? scheme.onPrimary : scheme.onSurface,
+                  ),
                 ),
               ),
       ),

@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 
 class ChatInputBar extends StatefulWidget {
-  final bool enabled;
+  final bool isStreaming;
   final ValueChanged<String> onSend;
+  final VoidCallback onStop;
 
-  const ChatInputBar({super.key, required this.enabled, required this.onSend});
+  const ChatInputBar({
+    super.key,
+    required this.isStreaming,
+    required this.onSend,
+    required this.onStop,
+  });
 
   @override
   State<ChatInputBar> createState() => _ChatInputBarState();
@@ -21,7 +27,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
 
   void _submit() {
     final text = _controller.text.trim();
-    if (text.isEmpty || !widget.enabled) return;
+    if (text.isEmpty || widget.isStreaming) return;
     widget.onSend(text);
     _controller.clear();
   }
@@ -53,8 +59,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
             ),
             const SizedBox(width: 8),
             IconButton.filled(
-              onPressed: widget.enabled ? _submit : null,
-              icon: const Icon(Icons.send),
+              onPressed: widget.isStreaming ? widget.onStop : _submit,
+              icon: Icon(widget.isStreaming ? Icons.stop : Icons.send),
             ),
           ],
         ),

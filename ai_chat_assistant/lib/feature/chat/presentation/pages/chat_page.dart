@@ -16,6 +16,17 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final _scrollController = ScrollController();
+  bool _stickToBottom = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (!_scrollController.hasClients) return;
+      final p = _scrollController.position;
+      _stickToBottom = p.pixels >= p.maxScrollExtent - 80;
+    });
+  }
 
   @override
   void dispose() {
@@ -25,7 +36,7 @@ class _ChatPageState extends State<ChatPage> {
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_scrollController.hasClients) return;
+      if (!_stickToBottom || !_scrollController.hasClients) return;
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     });
   }
@@ -44,8 +55,21 @@ class _ChatPageState extends State<ChatPage> {
             listenWhen: (prev, curr) =>
                 prev.status != curr.status && curr.status == ChatStatus.failure,
             listener: (context, state) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.errorMessage ?? 'Error')),
+              final messenger = ScaffoldMessenger.of(context);
+              messenger.hideCurrentSnackBar();
+              messenger.showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage ?? 'Something went wrong.'),
+                  duration: const Duration(seconds: 6),
+                  action: state.canRetry
+                      ? SnackBarAction(
+                          label: 'Retry',
+                          onPressed: () => context
+                              .read<ChatBloc>()
+                              .add(const RetryEvent()),
+                        )
+                      : null,
+                ),
               );
             },
           ),
@@ -82,9 +106,13 @@ class _ChatPageState extends State<ChatPage> {
               buildWhen: (prev, curr) => prev.isStreaming != curr.isStreaming,
               builder: (context, state) {
                 return ChatInputBar(
-                  enabled: !state.isStreaming,
-                  onSend: (text) =>
-                      context.read<ChatBloc>().add(SendMessageEvent(text)),
+                  isStreaming: state.isStreaming,
+                  onSend: (text) {
+                    _stickToBottom = true;
+                    context.read<ChatBloc>().add(SendMessageEvent(text));
+                  },
+                  onStop: () =>
+                      context.read<ChatBloc>().add(const StopGenerationEvent()),
                 );
               },
             ),

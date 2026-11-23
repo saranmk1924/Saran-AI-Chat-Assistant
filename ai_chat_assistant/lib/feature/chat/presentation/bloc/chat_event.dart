@@ -15,3 +15,11 @@ class SendMessageEvent extends ChatEvent {
   @override
   List<Object?> get props => [text];
 }
+
+class RetryEvent extends ChatEvent {
+  const RetryEvent();
+}
+
+class StopGenerationEvent extends ChatEvent {
+  const StopGenerationEvent();
+}

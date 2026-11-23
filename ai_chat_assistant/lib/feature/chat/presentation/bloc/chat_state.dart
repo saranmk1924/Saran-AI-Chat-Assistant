@@ -7,11 +7,13 @@ class ChatState extends Equatable {
   final List<MessageEntity> messages;
   final ChatStatus status;
   final String? errorMessage;
+  final bool canRetry;
 
   const ChatState({
     this.messages = const [],
     this.status = ChatStatus.initial,
     this.errorMessage,
+    this.canRetry = false,
   });
 
   bool get isStreaming => status == ChatStatus.streaming;
@@ -20,14 +22,16 @@ class ChatState extends Equatable {
     List<MessageEntity>? messages,
     ChatStatus? status,
     String? errorMessage,
+    bool canRetry = false,
   }) {
     return ChatState(
       messages: messages ?? this.messages,
       status: status ?? this.status,
       errorMessage: errorMessage,
+      canRetry: canRetry,
     );
   }
 
   @override
-  List<Object?> get props => [messages, status, errorMessage];
+  List<Object?> get props => [messages, status, errorMessage, canRetry];
 }

@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:ai_chat_assistant/core/utils/typewriter.dart';
 import 'package:ai_chat_assistant/feature/chat/domain/entity/message_entity.dart';
+import 'package:ai_chat_assistant/feature/chat/domain/failure/chat_exception.dart';
 import 'package:ai_chat_assistant/feature/chat/domain/usecase/send_message_usecase.dart';
 import 'package:ai_chat_assistant/feature/chat/presentation/bloc/chat_event.dart';
 import 'package:ai_chat_assistant/feature/chat/presentation/bloc/chat_state.dart';
@@ -8,9 +11,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final SendMessageUsecase sendMessageUsecase;
   int _idCounter = 0;
+  StreamSubscription<String>? _subscription;
+  Completer<void>? _completer;
 
   ChatBloc(this.sendMessageUsecase) : super(const ChatState()) {
     on<SendMessageEvent>(_onSendMessage);
+    on<RetryEvent>(_onRetry);
+    on<StopGenerationEvent>(_onStop);
   }
 
   String _newId() => '${DateTime.now().microsecondsSinceEpoch}_${_idCounter++}';
@@ -27,13 +34,48 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       role: MessageRole.user,
       text: text,
     );
-    final history = [...state.messages, userMessage];
+    await _generate([...state.messages, userMessage], emit);
+  }
+
+  Future<void> _onRetry(RetryEvent event, Emitter<ChatState> emit) async {
+    if (state.isStreaming) return;
+
+    final messages = [...state.messages];
+    if (messages.isNotEmpty && messages.last.role == MessageRole.assistant) {
+      messages.removeLast();
+    }
+    if (messages.isEmpty || messages.last.role != MessageRole.user) return;
+
+    await _generate(messages, emit);
+  }
+
+  void _onStop(StopGenerationEvent event, Emitter<ChatState> emit) {
+    if (!state.isStreaming) return;
+
+    unawaited(_subscription?.cancel());
+    _subscription = null;
+
+    final messages = [...state.messages];
+    if (messages.isNotEmpty &&
+        messages.last.role == MessageRole.assistant &&
+        messages.last.text.isEmpty) {
+      messages.removeLast();
+    }
+    emit(state.copyWith(messages: messages, status: ChatStatus.success));
+
+    final completer = _completer;
+    if (completer != null && !completer.isCompleted) completer.complete();
+  }
+
+  Future<void> _generate(
+    List<MessageEntity> history,
+    Emitter<ChatState> emit,
+  ) async {
     final placeholder = MessageEntity(
       id: _newId(),
       role: MessageRole.assistant,
       text: '',
     );
-
     emit(
       state.copyWith(
         messages: [...history, placeholder],
@@ -42,24 +84,48 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     );
 
     final buffer = StringBuffer();
-    try {
-      await for (final piece in typewriter(sendMessageUsecase(history))) {
+    final completer = Completer<void>();
+    _completer = completer;
+
+    _subscription = typewriter(sendMessageUsecase(history)).listen(
+      (piece) {
         buffer.write(piece);
         emit(
           state.copyWith(
-            messages: [...history, placeholder.copyWith(text: buffer.toString())],
+            messages: [
+              ...history,
+              placeholder.copyWith(text: buffer.toString()),
+            ],
           ),
         );
-      }
-      emit(state.copyWith(status: ChatStatus.success));
-    } catch (_) {
-      emit(
-        state.copyWith(
-          messages: buffer.isEmpty ? history : state.messages,
-          status: ChatStatus.failure,
-          errorMessage: 'Something went wrong. Please try again.',
-        ),
-      );
-    }
+      },
+      onError: (Object error) {
+        final failure = error is ChatException
+            ? error
+            : const ChatException(ChatErrorType.unknown);
+        emit(
+          state.copyWith(
+            messages: buffer.isEmpty ? history : state.messages,
+            status: ChatStatus.failure,
+            errorMessage: failure.message,
+            canRetry: failure.canRetry,
+          ),
+        );
+        if (!completer.isCompleted) completer.complete();
+      },
+      onDone: () {
+        emit(state.copyWith(status: ChatStatus.success));
+        if (!completer.isCompleted) completer.complete();
+      },
+      cancelOnError: true,
+    );
+
+    await completer.future;
+  }
+
+  @override
+  Future<void> close() {
+    unawaited(_subscription?.cancel());
+    return super.close();
   }
 }
