@@ -1,5 +1,11 @@
-import 'package:ai_chat_assistant/core/config/app_config.dart';
+// import 'package:ai_chat_assistant/core/config/app_config.dart';
+// import 'package:ai_chat_assistant/core/network/gemini_client.dart';
+// import 'package:dio/dio.dart';
+import 'package:ai_chat_assistant/core/dependencies/init_dependencies.dart';
 import 'package:ai_chat_assistant/core/network/gemini_client.dart';
+import 'package:ai_chat_assistant/feature/chat/data/datasource/chat_remote_datasource.dart';
+import 'package:ai_chat_assistant/feature/chat/data/repository/chat_repository_impl.dart';
+import 'package:ai_chat_assistant/feature/chat/domain/entity/message_entity.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -24,6 +30,23 @@ Future<void> main() async {
   // } on DioException catch (e) {
   //   debugPrint('Gemini error: ${e.response?.statusCode}');
   // }
+  final repo = ChatRepositoryImpl(ChatRemoteDatasource(GeminiClient.create()));
+  final history = [
+    const MessageEntity(
+      id: '1',
+      role: MessageRole.user,
+      text: 'Explain Clean Architecture in 5 sentences.',
+    ),
+  ];
+
+  try {
+    await for (final piece in repo.sendMessage(history)) {
+      debugPrint('PIECE: $piece');
+    }
+  } on DioException catch (e) {
+    debugPrint('Gemini error: ${e.response?.statusCode}');
+  }
+  initDependencies();
   runApp(const MyApp());
 }
 

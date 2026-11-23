@@ -9,4 +9,7 @@ class AppConfig {
   static const String geminiModel = 'gemini-3.5-flash';
 
   static bool get hasApiKey => geminiApiKey.isNotEmpty;
+
+  static const String chatSystemPrompt =
+    'You are a helpful, concise assistant. Answer clearly in simple language.';
 }
