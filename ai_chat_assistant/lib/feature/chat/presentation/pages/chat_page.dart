@@ -41,10 +41,49 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  Future<void> _confirmClear(BuildContext context) async {
+    final bloc = context.read<ChatBloc>();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Clear chat?'),
+        content: const Text('This deletes the whole conversation.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Clear'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) bloc.add(const ClearHistoryEvent());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('AI Chat Assistant')),
+      appBar: AppBar(
+        title: const Text('AI Chat Assistant'),
+        actions: [
+          BlocBuilder<ChatBloc, ChatState>(
+            buildWhen: (prev, curr) =>
+                prev.messages.isEmpty != curr.messages.isEmpty,
+            builder: (context, state) {
+              return IconButton(
+                tooltip: 'Clear chat',
+                icon: const Icon(Icons.delete_outline),
+                onPressed: state.messages.isEmpty
+                    ? null
+                    : () => _confirmClear(context),
+              );
+            },
+          ),
+        ],
+      ),
       body: MultiBlocListener(
         listeners: [
           BlocListener<ChatBloc, ChatState>(
@@ -64,9 +103,8 @@ class _ChatPageState extends State<ChatPage> {
                   action: state.canRetry
                       ? SnackBarAction(
                           label: 'Retry',
-                          onPressed: () => context
-                              .read<ChatBloc>()
-                              .add(const RetryEvent()),
+                          onPressed: () =>
+                              context.read<ChatBloc>().add(const RetryEvent()),
                         )
                       : null,
                 ),
@@ -89,7 +127,8 @@ class _ChatPageState extends State<ChatPage> {
                     itemBuilder: (context, index) {
                       final message = state.messages[index];
                       final isLast = index == state.messages.length - 1;
-                      final isWaiting = isLast &&
+                      final isWaiting =
+                          isLast &&
                           state.isStreaming &&
                           message.role == MessageRole.assistant &&
                           message.text.isEmpty;

@@ -23,3 +23,11 @@ class RetryEvent extends ChatEvent {
 class StopGenerationEvent extends ChatEvent {
   const StopGenerationEvent();
 }
+
+class LoadHistoryEvent extends ChatEvent {
+  const LoadHistoryEvent();
+}
+
+class ClearHistoryEvent extends ChatEvent {
+  const ClearHistoryEvent();
+}

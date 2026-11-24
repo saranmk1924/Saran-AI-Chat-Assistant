@@ -8,6 +8,7 @@ import 'package:ai_chat_assistant/core/theme/app_theme.dart';
 // import 'package:ai_chat_assistant/feature/chat/data/repository/chat_repository_impl.dart';
 // import 'package:ai_chat_assistant/feature/chat/domain/entity/message_entity.dart';
 import 'package:ai_chat_assistant/feature/chat/presentation/bloc/chat_bloc.dart';
+import 'package:ai_chat_assistant/feature/chat/presentation/bloc/chat_event.dart';
 import 'package:ai_chat_assistant/feature/chat/presentation/pages/chat_page.dart';
 // import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 Future<void> main() async {
   debugPrint('API key loaded: ${AppConfig.hasApiKey}');
-  // final dio = GeminiClient.create();   
+  // final dio = GeminiClient.create();
   // try {
   //   final res = await dio.post(
   //     '/models/${AppConfig.geminiModel}:generateContent',
@@ -51,7 +52,8 @@ Future<void> main() async {
   // } on DioException catch (e) {
   //   debugPrint('Gemini error: ${e.response?.statusCode}');
   // }
-  initDependencies();
+  WidgetsFlutterBinding.ensureInitialized();
+  await initDependencies();
   runApp(const MyApp());
 }
 
@@ -67,7 +69,8 @@ class MyApp extends StatelessWidget {
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.dark,
       home: BlocProvider(
-        create: (_) => serviceLocator<ChatBloc>(),
+        create: (_) =>
+            serviceLocator<ChatBloc>()..add(const LoadHistoryEvent()),
         child: const ChatPage(),
       ),
     );

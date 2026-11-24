@@ -19,4 +19,14 @@ class MessageModel extends MessageEntity {
       ],
     };
   }
+
+  Map<String, dynamic> toJson() => {'id': id, 'role': role.name, 'text': text};
+
+  factory MessageModel.fromJson(Map<String, dynamic> json) {
+    return MessageModel(
+      id: json['id'] as String,
+      role: MessageRole.values.byName(json['role'] as String),
+      text: json['text'] as String,
+    );
+  }
 }
