@@ -1,5 +1,4 @@
 import 'package:ai_chat_assistant/core/common_widget/chat_background.dart';
-import 'package:ai_chat_assistant/core/common_widget/gradient_sparkle.dart';
 import 'package:ai_chat_assistant/feature/chat/domain/entity/message_entity.dart';
 import 'package:ai_chat_assistant/feature/chat/presentation/bloc/chat_bloc.dart';
 import 'package:ai_chat_assistant/feature/chat/presentation/bloc/chat_event.dart';
@@ -95,10 +94,24 @@ class _ChatPageState extends State<ChatPage> {
           titleSpacing: 20,
           title: Row(
             children: [
-              const GradientSparkle(size: 22),
+              Container(
+                padding: const EdgeInsets.all(1.5),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.7),
+                    width: 1.2,
+                  ),
+                ),
+                child: const CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Colors.transparent,
+                  backgroundImage: AssetImage('assets/app_icon.png'),
+                ),
+              ),
               const SizedBox(width: 10),
               Text(
-                'AI Chat',
+                'Saran AI',
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
@@ -110,9 +123,13 @@ class _ChatPageState extends State<ChatPage> {
               buildWhen: (prev, curr) =>
                   prev.messages.isEmpty != curr.messages.isEmpty,
               builder: (context, state) {
-                return IconButton.filledTonal(
+                return IconButton(
                   tooltip: 'Clear chat',
-                  icon: const Icon(Icons.delete_outline),
+                  icon: const Icon(Icons.delete_outline_rounded, size: 22),
+                  color: theme.colorScheme.onSurfaceVariant,
+                  disabledColor: theme.colorScheme.onSurfaceVariant.withValues(
+                    alpha: 0.30,
+                  ),
                   onPressed: state.messages.isEmpty
                       ? null
                       : () => _confirmClear(context),

@@ -54,23 +54,25 @@ class _ChatInputBarState extends State<ChatInputBar> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOut,
-          padding: const EdgeInsets.fromLTRB(20, 4, 6, 4),
+          padding: const EdgeInsets.fromLTRB(18, 4, 6, 4),
           decoration: BoxDecoration(
-            color: scheme.surfaceContainerHigh.withValues(alpha: 0.85),
+            color: scheme.surface.withValues(alpha: 0.30),
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
               color: focused
-                  ? scheme.primary.withValues(alpha: 0.7)
-                  : scheme.outlineVariant.withValues(alpha: 0.4),
+                  ? scheme.primary.withValues(alpha: 0.55)
+                  : scheme.outlineVariant.withValues(alpha: 0.22),
+              width: 1,
             ),
             boxShadow: focused
                 ? [
                     BoxShadow(
-                      color: scheme.primary.withValues(alpha: 0.25),
-                      blurRadius: 18,
+                      color: scheme.primary.withValues(alpha: 0.10),
+                      blurRadius: 12,
+                      spreadRadius: 0,
                     ),
                   ]
-                : const [],
+                : [],
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -83,12 +85,19 @@ class _ChatInputBarState extends State<ChatInputBar> {
                     focusNode: _focusNode,
                     minLines: 1,
                     maxLines: 5,
+                    maxLength: 10000,
                     keyboardType: TextInputType.multiline,
                     textCapitalization: TextCapitalization.sentences,
                     style: theme.textTheme.bodyLarge,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Ask anything',
+                      hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                        color: scheme.onSurfaceVariant.withValues(alpha: 0.65),
+                      ),
                       border: InputBorder.none,
+                      counterText: '',
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
                       isDense: true,
                       contentPadding: EdgeInsets.zero,
                     ),
@@ -104,20 +113,23 @@ class _ChatInputBarState extends State<ChatInputBar> {
 
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    margin: const EdgeInsets.only(bottom: 2),
+                    margin: const EdgeInsets.only(bottom: 0),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: active
                           ? scheme.primary
-                          : scheme.surfaceContainerHighest,
+                          : scheme.surfaceContainerHighest.withValues(
+                              alpha: 0.35,
+                            ),
                     ),
                     child: IconButton(
                       onPressed: widget.isStreaming
                           ? widget.onStop
                           : (canSend ? _submit : null),
                       color: scheme.onPrimary,
-                      disabledColor:
-                          scheme.onSurfaceVariant.withValues(alpha: 0.5),
+                      disabledColor: scheme.onSurfaceVariant.withValues(
+                        alpha: 0.45,
+                      ),
                       icon: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 150),
                         child: Icon(
