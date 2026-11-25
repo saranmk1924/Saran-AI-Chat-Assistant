@@ -1,4 +1,4 @@
-# Saran AI - AI Chat Assistant
+# Saran AI - Chat Assistant
 
 A Flutter chat app powered by the Google Gemini API. Answers stream in live, errors are handled with specific messages, and the conversation is saved on the device. Built with Clean Architecture and BLoC.
 
