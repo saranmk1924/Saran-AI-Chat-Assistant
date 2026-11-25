@@ -9,7 +9,8 @@ import 'package:ai_chat_assistant/core/theme/app_theme.dart';
 // import 'package:ai_chat_assistant/feature/chat/domain/entity/message_entity.dart';
 import 'package:ai_chat_assistant/feature/chat/presentation/bloc/chat_bloc.dart';
 import 'package:ai_chat_assistant/feature/chat/presentation/bloc/chat_event.dart';
-import 'package:ai_chat_assistant/feature/chat/presentation/pages/chat_page.dart';
+// import 'package:ai_chat_assistant/feature/chat/presentation/pages/chat_page.dart';
+import 'package:ai_chat_assistant/feature/splash/splash.dart';
 // import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -71,7 +72,7 @@ class MyApp extends StatelessWidget {
       home: BlocProvider(
         create: (_) =>
             serviceLocator<ChatBloc>()..add(const LoadHistoryEvent()),
-        child: const ChatPage(),
+        child: const SplashPage(),
       ),
     );
   }
