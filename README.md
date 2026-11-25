@@ -8,19 +8,19 @@ A Flutter chat app powered by the Google Gemini API. Answers stream in live, err
 
 ### Splash
 
-![Splash](ai_chat_assistant\assets\app_screenshots\splash.jpg)
+![Splash](ai_chat_assistant/assets/app_screenshots/splash.jpg)
 
 ### Empty Chat
 
-![Empty Chat](ai_chat_assistant\assets\app_screenshots\empty_chat.jpg)
+![Empty Chat](ai_chat_assistant/assets/app_screenshots/empty_chat.jpg)
 
 ### Chat
 
-![Chat](ai_chat_assistant\assets\app_screenshots\chat.jpg)
+![Chat](ai_chat_assistant/assets/app_screenshots/chat.jpg)
 
 ### Clear Chat
 
-![Clear Chat](ai_chat_assistant\assets\app_screenshots\clear_chat.jpg)
+![Clear Chat](ai_chat_assistant/assets/app_screenshots/clear_chat.jpg)
 
 ## Features
 
