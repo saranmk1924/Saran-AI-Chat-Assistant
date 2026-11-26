@@ -1,4 +1,4 @@
-import 'package:ai_chat_assistant/core/config/app_config.dart';
+// import 'package:ai_chat_assistant/core/config/app_config.dart';
 // import 'package:ai_chat_assistant/core/network/gemini_client.dart';
 // import 'package:dio/dio.dart';
 import 'package:ai_chat_assistant/core/dependencies/init_dependencies.dart';
@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 Future<void> main() async {
-  debugPrint('API key loaded: ${AppConfig.hasApiKey}');
+  // debugPrint('API key loaded: ${AppConfig.hasApiKey}');
   // final dio = GeminiClient.create();
   // try {
   //   final res = await dio.post(

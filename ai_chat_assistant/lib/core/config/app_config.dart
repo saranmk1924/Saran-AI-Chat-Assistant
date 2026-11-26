@@ -1,20 +1,24 @@
 class AppConfig {
   AppConfig._();
 
-  static const String geminiApiKey = String.fromEnvironment('GEMINI_API_KEY');
+  static const String proxyUrl = String.fromEnvironment('PROXY_URL');
+  static const String appToken = String.fromEnvironment('APP_TOKEN');
 
-  static const String geminiBaseUrl =
-      'https://generativelanguage.googleapis.com/v1beta';
+  static bool get isConfigured => proxyUrl.isNotEmpty && appToken.isNotEmpty;
+  // static const String geminiApiKey = String.fromEnvironment('GEMINI_API_KEY');
 
-  static const String geminiModel = 'gemini-3.5-flash-lite';
+  // static const String geminiBaseUrl =
+  //     'https://generativelanguage.googleapis.com/v1beta';
 
-  static bool get hasApiKey => geminiApiKey.isNotEmpty;
+  // static const String geminiModel = 'gemini-3.5-flash-lite';
 
-  static const String chatSystemPrompt =
-      'You are a helpful, concise assistant. Answer clearly in simple language. '
-      'You do not have access to the internet or live data. If a question needs '
-      'current news, prices or recent events, say that your information may be '
-      'outdated.';
+  // static bool get hasApiKey => geminiApiKey.isNotEmpty;
+
+  // static const String chatSystemPrompt =
+  //     'You are a helpful, concise assistant. Answer clearly in simple language. '
+  //     'You do not have access to the internet or live data. If a question needs '
+  //     'current news, prices or recent events, say that your information may be '
+  //     'outdated.';
 }
 
 ///// MODELS /////

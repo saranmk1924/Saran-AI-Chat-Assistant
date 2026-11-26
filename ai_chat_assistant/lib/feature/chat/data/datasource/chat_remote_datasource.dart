@@ -1,9 +1,10 @@
 import 'dart:convert';
 
-import 'package:ai_chat_assistant/core/config/app_config.dart';
+// import 'package:ai_chat_assistant/core/config/app_config.dart';
 import 'package:ai_chat_assistant/feature/chat/data/model/message_model.dart';
 import 'package:dio/dio.dart';
 import 'package:ai_chat_assistant/feature/chat/domain/failure/chat_exception.dart';
+import 'package:flutter/material.dart';
 
 class ChatRemoteDatasource {
   final Dio dio;
@@ -13,16 +14,8 @@ class ChatRemoteDatasource {
   Stream<String> streamMessage(List<MessageModel> history) async* {
     try {
       final response = await dio.post<ResponseBody>(
-        '/models/${AppConfig.geminiModel}:streamGenerateContent',
-        queryParameters: {'alt': 'sse'},
-        data: {
-          'system_instruction': {
-            'parts': [
-              {'text': AppConfig.chatSystemPrompt},
-            ],
-          },
-          'contents': history.map((m) => m.toGeminiJson()).toList(),
-        },
+        '/',
+        data: {'messages': history.map((m) => m.toProxyJson()).toList()},
         options: Options(responseType: ResponseType.stream),
       );
 
@@ -55,6 +48,7 @@ class ChatRemoteDatasource {
         );
       }
     } on DioException catch (e) {
+      debugPrint('Dio error: ${e.type} ${e.response?.statusCode} ${e.message}');
       throw _mapDioException(e);
     } on FormatException {
       throw const ChatException(ChatErrorType.unknown);

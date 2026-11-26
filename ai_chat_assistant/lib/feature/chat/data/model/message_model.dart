@@ -11,14 +11,7 @@ class MessageModel extends MessageEntity {
     return MessageModel(id: entity.id, role: entity.role, text: entity.text);
   }
 
-  Map<String, dynamic> toGeminiJson() {
-    return {
-      'role': role == MessageRole.user ? 'user' : 'model',
-      'parts': [
-        {'text': text},
-      ],
-    };
-  }
+  Map<String, dynamic> toProxyJson() => {'role': role.name, 'text': text};
 
   Map<String, dynamic> toJson() => {'id': id, 'role': role.name, 'text': text};
 
