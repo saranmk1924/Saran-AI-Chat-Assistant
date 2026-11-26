@@ -1,4 +1,5 @@
 const MODELS = [
+  // 'not-a-real-model',
   "gemini-3.5-flash",
   "gemini-3.5-flash-lite",
   "gemini-3.8-flash",
@@ -105,6 +106,11 @@ export default {
       console.log(
         `model=${model} status=${upstream.status} start_ms=${Date.now() - started}`,
       );
+
+      if (!upstream.ok) {
+        const detail = (await upstream.clone().text()).slice(0, 300);
+        console.log(`model=${model} error_body=${detail}`);
+      }
 
       const retryable = [503, 404, 429].includes(upstream.status);
       if (!retryable) break;
