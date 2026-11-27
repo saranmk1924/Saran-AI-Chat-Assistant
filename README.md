@@ -123,9 +123,15 @@ Requirements: Flutter SDK, Node.js (LTS), a device or emulator, a free [Cloudfla
 
 ```bash
 cd backend
-# local secrets (git-ignored): create backend/.dev.vars with
-#   GEMINI_API_KEY=<your key>
-#   APP_TOKEN=<any long random string>
+
+# Generate a random APP_TOKEN:
+#   Windows (PowerShell): [guid]::NewGuid().ToString('N')
+#   macOS / Linux:        openssl rand -hex 16
+
+# Create local secrets (git-ignored) in backend/.dev.vars:
+#   GEMINI_API_KEY=<your_key>
+#   APP_TOKEN=<generated_token>
+
 npx wrangler login
 npx wrangler secret put GEMINI_API_KEY
 npx wrangler secret put APP_TOKEN
