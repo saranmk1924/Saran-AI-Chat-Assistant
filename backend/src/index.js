@@ -9,66 +9,63 @@ const geminiUrl = (model) =>
   `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse`;
 
 const SYSTEM_PROMPT =
-  "You are a helpful, concise assistant. Answer clearly in simple language. " +
-  "You do not have access to the internet or live data. If a question needs " +
-  "current news, prices or recent events, say that your information may be outdated.";
+  'You are a helpful, concise assistant. Answer clearly in simple language. ' +
+  'You do not have access to the internet or live data. If a question needs ' +
+  'current news, prices or recent events, say that your information may be outdated.';
 
-const MAX_MESSAGES = 50;
-const MAX_TOTAL_CHARS = 20000;
+// Must stay ABOVE the app's ContextWindow limits (40 messages / 40,000 chars)
+const MAX_MESSAGES = 60;
+const MAX_TOTAL_CHARS = 50000;
 const HEADER_TIMEOUT_MS = 15000;
 
 function json(body, status) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { 'Content-Type': 'application/json' },
   });
 }
 
 function validate(body) {
   if (!body || !Array.isArray(body.messages) || body.messages.length === 0) {
-    return "messages must be a non-empty array";
+    return 'messages must be a non-empty array';
   }
-  if (body.messages.length > MAX_MESSAGES) return "too many messages";
+  if (body.messages.length > MAX_MESSAGES) return 'too many messages';
 
   let total = 0;
   for (const m of body.messages) {
-    if (!m || (m.role !== "user" && m.role !== "assistant"))
-      return "invalid role";
-    if (typeof m.text !== "string" || m.text.trim() === "") return "empty text";
+    if (!m || (m.role !== 'user' && m.role !== 'assistant')) return 'invalid role';
+    if (typeof m.text !== 'string' || m.text.trim() === '') return 'empty text';
     total += m.text.length;
   }
-  if (total > MAX_TOTAL_CHARS) return "conversation too long";
-  if (body.messages[body.messages.length - 1].role !== "user") {
-    return "last message must be from the user";
+  if (total > MAX_TOTAL_CHARS) return 'conversation too long';
+  if (body.messages[body.messages.length - 1].role !== 'user') {
+    return 'last message must be from the user';
   }
   return null;
 }
 
 function toGeminiContents(messages) {
   return messages.map((m) => ({
-    role: m.role === "assistant" ? "model" : "user",
+    role: m.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: m.text }],
   }));
 }
 
 export default {
   async fetch(request, env) {
-    if (request.method !== "POST") {
-      return json({ error: "method_not_allowed" }, 405);
+    if (request.method !== 'POST') {
+      return json({ error: 'method_not_allowed' }, 405);
     }
 
-    if (
-      !env.APP_TOKEN ||
-      request.headers.get("x-app-token") !== env.APP_TOKEN
-    ) {
-      return json({ error: "unauthorized" }, 401);
+    if (!env.APP_TOKEN || request.headers.get('x-app-token') !== env.APP_TOKEN) {
+      return json({ error: 'unauthorized' }, 401);
     }
 
     let body;
     try {
       body = await request.json();
     } catch {
-      return json({ error: "invalid_json" }, 400);
+      return json({ error: 'invalid_json' }, 400);
     }
 
     const problem = validate(body);
@@ -87,10 +84,10 @@ export default {
 
       try {
         upstream = await fetch(geminiUrl(model), {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": env.GEMINI_API_KEY,
+            'Content-Type': 'application/json',
+            'x-goog-api-key': env.GEMINI_API_KEY,
           },
           body: payload,
           signal: controller.signal,
@@ -117,16 +114,16 @@ export default {
       await upstream.body?.cancel();
     }
 
-    if (!upstream) return json({ error: "upstream_timeout" }, 504);
+    if (!upstream) return json({ error: 'upstream_timeout' }, 504);
 
     if (!upstream.ok) {
-      return json({ error: "upstream_error" }, upstream.status);
+      return json({ error: 'upstream_error' }, upstream.status);
     }
 
     return new Response(upstream.body, {
       headers: {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
       },
     });
   },
