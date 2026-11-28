@@ -1,4 +1,5 @@
 import 'package:ai_chat_assistant/feature/chat/domain/entity/message_entity.dart';
+import 'package:ai_chat_assistant/feature/chat/domain/policy/context_window.dart';
 import 'package:equatable/equatable.dart';
 
 enum ChatStatus { initial, streaming, success, failure }
@@ -17,6 +18,9 @@ class ChatState extends Equatable {
   });
 
   bool get isStreaming => status == ChatStatus.streaming;
+
+  /// True when the AI no longer reads the whole chat (shows the notice).
+  bool get isContextTrimmed => ContextWindow.isTrimmed(messages);
 
   ChatState copyWith({
     List<MessageEntity>? messages,

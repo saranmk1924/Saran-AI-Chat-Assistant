@@ -1,5 +1,5 @@
 import 'package:ai_chat_assistant/core/network/proxy_client.dart';
-import 'package:ai_chat_assistant/feature/chat/data/datasource/char_local_datasource.dart';
+import 'package:ai_chat_assistant/feature/chat/data/datasource/chat_local_datasource.dart';
 import 'package:ai_chat_assistant/feature/chat/data/datasource/chat_remote_datasource.dart';
 import 'package:ai_chat_assistant/feature/chat/data/repository/chat_repository_impl.dart';
 import 'package:ai_chat_assistant/feature/chat/domain/repository/chat_repository.dart';

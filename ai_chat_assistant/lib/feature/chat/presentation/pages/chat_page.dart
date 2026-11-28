@@ -4,6 +4,7 @@ import 'package:ai_chat_assistant/feature/chat/presentation/bloc/chat_bloc.dart'
 import 'package:ai_chat_assistant/feature/chat/presentation/bloc/chat_event.dart';
 import 'package:ai_chat_assistant/feature/chat/presentation/bloc/chat_state.dart';
 import 'package:ai_chat_assistant/feature/chat/presentation/widgets/chat_input_bar.dart';
+import 'package:ai_chat_assistant/feature/chat/presentation/widgets/context_notice.dart';
 import 'package:ai_chat_assistant/feature/chat/presentation/widgets/empty_chat_view.dart';
 import 'package:ai_chat_assistant/feature/chat/presentation/widgets/message_bubble.dart';
 import 'package:flutter/material.dart';
@@ -242,6 +243,14 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ],
                 ),
+              ),
+              // NEW: hint shown when the AI no longer reads the whole chat
+              BlocBuilder<ChatBloc, ChatState>(
+                buildWhen: (prev, curr) =>
+                    prev.isContextTrimmed != curr.isContextTrimmed,
+                builder: (context, state) {
+                  return ContextNotice(visible: state.isContextTrimmed);
+                },
               ),
               BlocBuilder<ChatBloc, ChatState>(
                 buildWhen: (prev, curr) => prev.isStreaming != curr.isStreaming,
